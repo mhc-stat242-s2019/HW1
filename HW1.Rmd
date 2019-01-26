@@ -1,0 +1,176 @@
+---
+title: "HW1"
+author: "Your Name Here"
+output: pdf_document
+---
+
+## Problem 1: Adapted from Sleuth3 1.17
+
+Seven students volunteered for a comparison of study guides for an advanced course in mathematics.  They were randomly assigned to, four to study guide A and three to study guide B.  All were instructed to study independently.  Following a two-day study period, all students were given an examination about the material covered by the guides, with the following results:
+
+Study Guide A scores:  68 77, 82, 85
+
+Study Guide B scores: 53, 64, 71
+
+### (a) What is the difference between sample averages for the two groups?
+
+
+
+### (b) State relevant null and alternative hypotheses to compare the performance of the students assigned to each group.
+
+You might use $\mu_1$ and $\mu_2$ or $\delta$ as your parameters.  Whichever parameter(s) you choose to use in your statement of the hypotheses, please write a brief sentence defining what the parameter(s) are in the context of this example.
+
+
+
+### (c) Perform a randomization test by listing all possible ways that these students could have been randomized to two groups.  There are 35 ways.  For each such randomization, calculate the difference between sample averages.  Finally, calculate the two-sided $p$ value for the observed outcome.
+
+
+
+### (d) Write a sentence or two interpreting the p-value in context.  (I am not looking for a conclusion for the test here, but a restatement of the definition of the p-value in the context of this example.  We will talk about using p-values to draw conclusions in the next Chapter.)
+
+
+
+
+
+## Problem 2: Adapted from Sleuth3 1.26
+
+Each year, the League of Conservation Voters (LCV) identifies legislative votes taken in each house of the U.S. Congress -- votes that are highly influential in establishing policy and action on evironmental problems.  The LCV then publishes whether each member of Congress cast a pro-environment or an anti-environment vote.  The following R code reads in a data set with the LCV's ratings for each member of House of Representatives from 2005 to 2007, and filters it to include results for only Democrats and Republicans (not Independents).
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+lcv_ratings <- read.csv("http://www.evanlray.com/data/sleuth3/ex0126_lcv_house.csv") %>%
+  filter(
+    Party %in% c("D", "R")
+  )
+```
+
+### (a) Variations on a histogram
+
+The purpose of this part of the exercise is to explore a bunch of options for how to build histograms using `ggplot2` in R.  As a starting point, here's a histogram summarizing the distribution of the overall percentage of "pro-environment" votes for all representatives in the data set:
+
+```{r}
+ggplot(data = lcv_ratings, mapping = aes(x = PctPro)) +
+  geom_histogram()
+```
+
+Recall from your DataCamp assignment that the first line of this code sets up a new plot based on the `lcv_ratings` data frame.  It also sets up an aesthetic mapping, putting the `PctPro` variable on the `x` (horizontal) axis.  The geometry type of the plot is a `histogram`.
+
+#### i. Add facetting by the representatives' `Party`
+
+Add facetting to the plot code below using `facet_grid` or `facet_wrap` (either way, your choice).  If you don't remember how to do this, check out the module about this on the DataCamp assignment.
+
+```{r}
+ggplot(data = lcv_ratings, mapping = aes(x = PctPro)) +
+  geom_histogram()
+```
+
+#### ii. Add a fill by the representatives' `Party`
+
+Add a second aesthetic mapping by adding `, fill = Party` after `x = PctPro`.
+
+```{r}
+ggplot(data = lcv_ratings, mapping = aes(x = PctPro)) +
+  geom_histogram()
+```
+
+#### iii. Set the number of bins used and the boundary of the bins
+
+Add a `bins = 10` argument to the `geom_histogram()` function call (between the parentheses after `geom_histogram`).  Experiment with the number of bins used until you find a number of bins that looks like it provides a good summary of the data.
+
+Also add a `boundary = 0` argument to the `geom_histogram()` function call, separated by a comma from the `bins` argument.  This argument specifies that one of the bins will have its left endpoint at 0 on the horizontal axis.  The locations of the other bins are determined by the width of the bins.
+
+```{r}
+ggplot(data = lcv_ratings, mapping = aes(x = PctPro)) +
+  geom_histogram()
+```
+
+#### iv. Set the width of the bins used
+
+Add a `binwidth = 10` argument to the `geom_histogram()` function call (between the parentheses after `geom_histogram`).  Experiment with the width of the bins used until you find a bin width that looks like it provides a good summary of the data.
+
+Also add a `boundary = 0` argument to the `geom_histogram()` function call, separated by a comma from the `bins` argument.  This argument specifies that one of the bins will have its left endpoint at 0 on the horizontal axis.  The locations of the other bins are determined by the bin width.
+
+
+```{r}
+ggplot(data = lcv_ratings, mapping = aes(x = PctPro)) +
+  geom_histogram()
+```
+
+#### v. Set a more informative plot title and axis labels
+
+I've provided the set up for this below, but you should fill in appropriate values between the quotes.
+
+```{r}
+ggplot(data = lcv_ratings, mapping = aes(x = PctPro)) +
+  geom_histogram() +
+  ggtitle("") + 
+  xlab("") +
+  ylab("")
+```
+
+#### vi. By combining your choice of some of the different ideas above, create a histogram that you think does the best job of conveying what's going on in the data set.
+
+```{r}
+ggplot(data = lcv_ratings, mapping = aes(x = PctPro)) +
+  geom_histogram()
+```
+
+### (b) Conduct a hypothesis test to compare pro-environment votes for Democratic and Republican members of the house of representatives.
+
+#### i. Define the parameter or parameters you are making inference about.
+
+
+
+#### ii. State the null and alternative hypotheses for a two-sided test.
+
+
+
+#### iii. The code below is adapted from the code in our lab, and calculates an approximate p-value from a permutation test with 1,000 permutations.  Run this code to get the p-value (you don't need to modify the code at all).  (Just so you're not confused by the output - the approximate p-value is 0!)
+
+```{r}
+library(mosaic)
+
+# set a seed to get reproducible results
+set.seed(51394)
+
+# find observed difference in means for the actual sample data
+group_means <- lcv_ratings %>%
+  group_by(Party) %>%
+  summarize(mean_PctPro = mean(PctPro))
+
+observed_group_means_difference <- group_means$mean_PctPro[1] - group_means$mean_PctPro[2]
+
+# simulate 10000 random assignments of legislators to the different parties,
+# and for each simulation calculate the mean 
+simulation_results <- do(1000) * {
+  shuffled_group_means <- lcv_ratings %>%
+    mutate(
+      Party = shuffle(Party)
+    ) %>%
+    group_by(Party) %>%
+    summarize(mean_PctPro = mean(PctPro))
+  
+  shuffled_group_means$mean_PctPro[1] - shuffled_group_means$mean_PctPro[2]
+}
+
+count_greater <- simulation_results %>%
+  summarize(
+    count = sum(result >= observed_group_means_difference)
+  )
+count_less <- simulation_results %>%
+  summarize(
+    count = sum(result <= -observed_group_means_difference)
+  )
+
+approximate_pval <- (count_greater$count + count_less$count) / 1000
+
+approximate_pval
+```
+
+#### iv. Write a sentence or two interpreting the p-value in context.  (I am not looking for a conclusion for the test here, but a restatement of the definition of the p-value in the context of this example.  We will talk about using p-values to draw conclusions in the next Chapter.)
+
+
+
+
